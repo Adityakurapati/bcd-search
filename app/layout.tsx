@@ -89,7 +89,7 @@ export const metadata: Metadata = {
 
   openGraph: {
 
-    title: "Vaibhav Jain | BCD Election 2026",
+    title: "GET YOUR VOTER SLIP | BCD Election 2026",
 
     description:
 
