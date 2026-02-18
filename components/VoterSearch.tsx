@@ -1,12 +1,16 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { searchVoterByPhone, VoterResult } from '@/lib/voterService';
+import Image from 'next/image';
+import { searchVoterByPhone, searchVoterByName, VoterResult } from '@/lib/voterService';
 import VoterSlipModal from './VoterSlipModal';
 import { Button } from '@/components/ui/button';
-import { Search, Loader2 } from 'lucide-react';
+import { Search, Loader2, Phone, User } from 'lucide-react';
+
+type SearchType = 'phone' | 'name';
 
 export default function VoterSearch() {
+  const [searchType, setSearchType] = useState<SearchType>('phone');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<VoterResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -16,198 +20,204 @@ export default function VoterSearch() {
 
   const handleSearch = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!searchQuery.trim()) {
-      setSearchResults([]);
-      setHasSearched(false);
-      return;
-    }
+    if (!searchQuery.trim()) return;
 
     setIsLoading(true);
     setHasSearched(true);
 
     try {
-      const results = await searchVoterByPhone(searchQuery.trim());
+      let results: VoterResult[] = [];
+
+      if (searchType === 'phone') {
+        results = await searchVoterByPhone(searchQuery.trim());
+      } else {
+        results = await searchVoterByName(searchQuery.trim());
+      }
+
       setSearchResults(results);
     } catch (error) {
-      console.error("[v0] Search error:", error);
+      console.error(error);
       setSearchResults([]);
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery]);
-
-  const handleClearSearch = () => {
-    setSearchQuery('');
-    setSearchResults([]);
-    setHasSearched(false);
-  };
-
-  const handleViewSlip = (voter: VoterResult) => {
-    setSelectedVoter(voter);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedVoter(null);
-  };
+  }, [searchQuery, searchType]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-blue-900 to-slate-900">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-900 to-slate-800 text-white py-12 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            BCD Electoral Roll
-          </h1>
-          <p className="text-lg text-blue-100">
-            Verify your entry in the voter list
-          </p>
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900">
+
+      {/* ================= HERO CANDIDATE SECTION ================= */}
+      <div className="bg-gradient-to-r from-blue-950 to-slate-900 text-white py-12 px-4 border-b-4 border-yellow-500">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-center">
+
+          {/* Candidate Image */}
+          <div className="flex justify-center md:justify-start">
+            <div className="relative w-64 h-72 rounded-xl overflow-hidden border-4 border-yellow-500 shadow-2xl">
+              <Image
+                src="/vibhav_jain.jpeg"
+                alt="Vaibhav Jain Advocate"
+                fill
+                className="object-cover"
+              />
+            </div>
+          </div>
+
+          {/* Candidate Info */}
+          <div>
+            <h1 className="text-4xl md:text-5xl font-bold text-yellow-400">
+              VAIBHAV JAIN
+            </h1>
+
+            <p className="text-xl mt-2 text-blue-100">
+              Advocate | Contesting for Member
+            </p>
+
+            <div className="mt-6 bg-yellow-500 text-slate-900 px-6 py-4 rounded-xl shadow-lg inline-block">
+              <p className="text-sm font-semibold tracking-wider">
+                BALLOT NUMBER
+              </p>
+              <p className="text-4xl font-bold">136</p>
+            </div>
+
+            <div className="mt-6 space-y-2 text-blue-100">
+              <p>🗳️ Election Dates: <span className="font-semibold text-white">21 - 22 - 23 Feb 2026</span></p>
+              <p>📍 Bar Council of Delhi Election</p>
+              <p>📞 Contact: <span className="font-semibold text-white">+91 9999647017</span></p>
+            </div>
+
+            <div className="mt-6 bg-slate-800 p-5 rounded-lg border border-yellow-400">
+              <p className="text-blue-100 leading-relaxed">
+                Dear Members of the Bar Council of Delhi,
+                <br /><br />
+                I humbly request your valuable support in the upcoming BCD Election.
+                Kindly cast your vote in favour of <span className="text-yellow-400 font-semibold">Vaibhav Jain (Ballot No. 136)</span>
+                as your <span className="font-semibold">First / Best Preference</span>.
+                <br /><br />
+                Together, let us build a stronger and more progressive Bar Council.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Search Section */}
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <div className="bg-white rounded-xl shadow-lg p-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+      {/* ================= SEARCH SECTION ================= */}
+      <div className="max-w-4xl mx-auto px-4 py-16">
+
+        <div className="bg-white rounded-2xl shadow-2xl p-10">
+
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-3">
             Find Your Entry in the Electoral Roll
           </h2>
+
           <p className="text-center text-gray-600 mb-8">
-            Search by your contact number to view your voter information
+            Verify your details in the BCD Final Voter List 2026
           </p>
 
+          {/* Tabs */}
+          <div className="flex justify-center mb-8">
+            <div className="inline-flex rounded-lg border bg-gray-100 p-1">
+              <button
+                onClick={() => setSearchType('phone')}
+                className={`px-6 py-2 rounded-lg text-sm font-medium ${
+                  searchType === 'phone'
+                    ? 'bg-blue-900 text-white'
+                    : 'text-gray-600'
+                }`}
+              >
+                <Phone className="inline w-4 h-4 mr-2" />
+                Search by Phone
+              </button>
+
+              <button
+                onClick={() => setSearchType('name')}
+                className={`px-6 py-2 rounded-lg text-sm font-medium ${
+                  searchType === 'name'
+                    ? 'bg-blue-900 text-white'
+                    : 'text-gray-600'
+                }`}
+              >
+                <User className="inline w-4 h-4 mr-2" />
+                Search by Name
+              </button>
+            </div>
+          </div>
+
           {/* Search Form */}
-          <form onSubmit={handleSearch} className="mb-8">
+          <form onSubmit={handleSearch}>
             <div className="relative mb-6">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
-                type="tel"
+                type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="+91 9810027994"
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-600 text-lg"
+                placeholder={
+                  searchType === 'phone'
+                    ? 'Enter phone number'
+                    : 'Enter full name'
+                }
+                className="w-full px-6 py-4 border-2 border-gray-300 rounded-xl focus:border-blue-900 focus:outline-none text-lg"
               />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={handleClearSearch}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  ✕
-                </button>
-              )}
             </div>
 
             <Button
               type="submit"
-              disabled={isLoading || !searchQuery.trim()}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold text-lg flex items-center justify-center gap-2 disabled:opacity-50"
+              disabled={isLoading}
+              className="w-full bg-blue-900 hover:bg-blue-800 text-white py-4 rounded-xl text-lg font-semibold"
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
                   Searching...
                 </>
               ) : (
                 <>
-                  <Search className="w-5 h-5" />
+                  <Search className="w-5 h-5 mr-2" />
                   Search Voter
                 </>
               )}
             </Button>
           </form>
-
-          {/* Filter Info */}
-          <div className="flex items-center justify-center gap-2 text-sm text-gray-600 mb-8">
-            <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 rounded-lg">
-              <span className="text-xs font-semibold text-blue-700">📱 PHONE NUMBER</span>
-            </div>
-          </div>
         </div>
 
-        {/* Search Results */}
-        {hasSearched && (
-          <div className="mt-8">
-            {isLoading ? (
-              <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-                <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-600 mb-4" />
-                <p className="text-gray-600">Searching voter records...</p>
-              </div>
-            ) : searchResults.length > 0 ? (
-              <div className="space-y-4">
-                <div className="text-sm font-semibold text-white mb-4">
-                  {searchResults.length} RESULT{searchResults.length !== 1 ? 'S' : ''} FOUND
+        {/* Results */}
+        {hasSearched && searchResults.length > 0 && (
+          <div className="mt-10 space-y-6">
+            {searchResults.map((voter) => (
+              <div
+                key={voter.id}
+                className="bg-white rounded-xl shadow-lg p-6 flex justify-between items-center"
+              >
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900">
+                    {voter.name}
+                  </h3>
+                  <p className="text-gray-600">
+                    Voter ID: {voter.voter_id}
+                  </p>
+                  <p className="text-gray-600">
+                    Mobile: {voter.mobile}
+                  </p>
                 </div>
-                {searchResults.map((voter) => (
-                  <div
-                    key={voter.id}
-                    className="bg-white rounded-lg shadow-lg p-6 flex items-center justify-between hover:shadow-xl transition"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                          <span className="text-blue-600 font-bold text-lg">
-                            {voter.sr_no}
-                          </span>
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-bold text-gray-900">
-                            {voter.name}
-                          </h3>
-                          <p className="text-sm text-gray-600">
-                            {voter.voter_id}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <Button
-                      onClick={() => handleViewSlip(voter)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold whitespace-nowrap ml-4"
-                    >
-                      View Slip
-                    </Button>
-                  </div>
-                ))}
+
+                <Button
+                  onClick={() => {
+                    setSelectedVoter(voter);
+                    setIsModalOpen(true);
+                  }}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 py-2 rounded-lg"
+                >
+                  Download Slip
+                </Button>
               </div>
-            ) : (
-              <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-                <div className="text-6xl mb-4">🔍</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  No Results Found
-                </h3>
-                <p className="text-gray-600">
-                  We couldn't find any voter with the phone number{' '}
-                  <span className="font-semibold">{searchQuery}</span>
-                </p>
-                <p className="text-gray-500 text-sm mt-4">
-                  Please check the phone number and try again
-                </p>
-              </div>
-            )}
+            ))}
           </div>
         )}
 
-        {/* Welcome Message */}
-        {!hasSearched && (
-          <div className="mt-12 bg-white rounded-xl shadow-lg p-8 text-center">
-            <div className="text-5xl mb-4">🗳️</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">
-              Welcome to Voter Slip Search
-            </h3>
-            <p className="text-gray-600 max-w-md mx-auto">
-              Enter your phone number to find your entry in the BCD Electoral Roll and view
-              your complete voter information.
-            </p>
-          </div>
-        )}
       </div>
 
-      {/* Modal */}
       <VoterSlipModal
         voter={selectedVoter}
-        onClose={handleCloseModal}
         isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
       />
     </div>
   );
