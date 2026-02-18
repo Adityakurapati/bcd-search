@@ -78,7 +78,7 @@ export default function VoterSearch() {
                 <h1 className="text-lg sm:text-2xl font-bold text-yellow-400 leading-tight">VAIBHAV JAIN</h1>
                 <p className="text-xs sm:text-sm text-blue-100">Advocate | Contesting for Member</p>
                 <p className="text-xs text-blue-200 mt-0.5">🗳️ 21–23 Feb 2026 · Bar Council of Delhi</p>
-                <p className="text-xs text-blue-200">📞 +91 9999647017</p>
+                <p className="text-xs text-blue-200">📞 +91 9650843200</p>
               </div>
 
 
