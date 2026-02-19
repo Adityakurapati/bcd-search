@@ -59,15 +59,15 @@ export default function VoterSearch() {
           <div className="flex flex-row gap-3 items-center pt-4">
 
             {/* Photo */}
-            <div className="flex-shrink-0-">
-              <div className="relative w-20 h-24 sm:w-24 sm:h-28 md:w-28 md:h-32 rounded-lg overflow-hidden border-2 border-yellow-500 shadow-xl">
-                <Image
-                  src="/vibhav_jain.jpeg"
-                  alt="Vaibhav Jain Advocate"
-                  fill
-                  className="object-cover"
-                />
-              </div>
+            <div className="relative w-20 h-28 rounded-lg overflow-hidden border-2 border-yellow-400 shadow-lg">
+
+              <Image
+                src="/vibhav_jain.jpeg"
+                alt="Vaibhav Jain"
+                fill
+                className="object-cover"
+              />
+
             </div>
 
             {/* Info */}
@@ -87,10 +87,10 @@ export default function VoterSearch() {
             </div>
             <div className='flex flex-col items-center'>
               {/* Ballot badge */}
-            <div className="bg-yellow-500 text-slate-900 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg shadow-md text-center flex-shrink-0 self-start sm:self-center">
-              <p className="text-xs font-semibold tracking-wider uppercase leading-none">Ballot No.</p>
-              <p className="text-2xl sm:text-3xl font-bold leading-tight">136</p>
-            </div>
+              <div className="bg-yellow-500 text-slate-900 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg shadow-md text-center flex-shrink-0 self-start sm:self-center">
+                <p className="text-xs font-semibold tracking-wider uppercase leading-none">Ballot No.</p>
+                <p className="text-2xl sm:text-3xl font-bold leading-tight">136</p>
+              </div>
             </div>
 
 
@@ -126,8 +126,8 @@ export default function VoterSearch() {
                 <button
                   onClick={() => { setSearchType('phone'); setHasSearched(false); setSearchResults([]); }}
                   className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${searchType === 'phone'
-                      ? 'bg-yellow-500 text-slate-900'
-                      : 'text-blue-200 hover:text-white'
+                    ? 'bg-yellow-500 text-slate-900'
+                    : 'text-blue-200 hover:text-white'
                     }`}
                 >
                   <Phone className="inline w-3.5 h-3.5 mr-1.5" />
@@ -136,8 +136,8 @@ export default function VoterSearch() {
                 <button
                   onClick={() => { setSearchType('name'); setHasSearched(false); setSearchResults([]); }}
                   className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${searchType === 'name'
-                      ? 'bg-yellow-500 text-slate-900'
-                      : 'text-blue-200 hover:text-white'
+                    ? 'bg-yellow-500 text-slate-900'
+                    : 'text-blue-200 hover:text-white'
                     }`}
                 >
                   <User className="inline w-3.5 h-3.5 mr-1.5" />

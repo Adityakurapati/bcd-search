@@ -1,180 +1,278 @@
-import { VoterResult } from './voterService';
+import { VoterResult } from "./voterService";
 
-/**
- * Generate formatted voter details for sharing
- */
-export function formatVoterDetailsForShare(voter: VoterResult): string {
-  return `
-🗳️ Voter Information
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Serial No: ${voter.sr_no}
-Name: ${voter.name}
-Voter ID: ${voter.voter_id}
-Contact: ${voter.mobile}
-Address: ${voter.address}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
-}
 
-/**
- * Share voter details via WhatsApp
- */
-export function shareViaWhatsApp(voter: VoterResult): void {
-  const message = encodeURIComponent(formatVoterDetailsForShare(voter));
-  const whatsappUrl = `https://wa.me/?text=${message}`;
-  window.open(whatsappUrl, '_blank');
-}
+const IMAGE_URL = `${window.location.origin}/vibhav_jain.jpeg`;
 
-/**
- * Share voter details via direct contact (SMS/Message)
- */
-export function shareViaContact(voter: VoterResult): void {
-  const message = formatVoterDetailsForShare(voter);
-  const contactUrl = `sms:?body=${encodeURIComponent(message)}`;
-  window.location.href = contactUrl;
-}
 
-/**
- * Copy voter details to clipboard
- */
-export async function copyToClipboard(voter: VoterResult): Promise<boolean> {
-  try {
-    const text = formatVoterDetailsForShare(voter);
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch (error) {
-    console.error("[v0] Error copying to clipboard:", error);
-    return false;
-  }
-}
+/* ================= HTML TEMPLATE ================= */
 
-/**
- * Download voter slip as text file
- */
-export function downloadVoterSlip(voter: VoterResult): void {
-  const content = formatVoterDetailsForShare(voter);
-  const element = document.createElement('a');
-  element.setAttribute(
-    'href',
-    `data:text/plain;charset=utf-8,${encodeURIComponent(content)}`
-  );
-  element.setAttribute('download', `voter-slip-${voter.sr_no}.txt`);
-  element.style.display = 'none';
-  document.body.appendChild(element);
-  element.click();
-  document.body.removeChild(element);
-}
+function generateSlipHTML(voter: VoterResult) {
 
-/**
- * Generate HTML for printing
- */
-export function generatePrintHTML(voter: VoterResult): string {
-  return `
-<!DOCTYPE html>
+return `
+
 <html>
+
 <head>
-  <title>Voter Slip - ${voter.sr_no}</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background: #f5f5f5;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background: white;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .header {
-      text-align: center;
-      border-bottom: 2px solid #1e3a5f;
-      padding-bottom: 20px;
-      margin-bottom: 30px;
-    }
-    .serial {
-      color: #666;
-      font-size: 12px;
-      margin-bottom: 10px;
-    }
-    h1 {
-      color: #1e3a5f;
-      margin: 0;
-      font-size: 28px;
-    }
-    .voter-id {
-      color: #666;
-      font-size: 14px;
-      margin-top: 8px;
-    }
-    .details {
-      display: grid;
-      gap: 20px;
-    }
-    .detail-item {
-      border-left: 3px solid #d4a574;
-      padding-left: 16px;
-    }
-    .label {
-      color: #999;
-      font-size: 12px;
-      text-transform: uppercase;
-      font-weight: bold;
-      margin-bottom: 4px;
-    }
-    .value {
-      color: #1e3a5f;
-      font-size: 16px;
-      font-weight: 500;
-    }
-    .footer {
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid #eee;
-      text-align: center;
-      color: #999;
-      font-size: 12px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <div class="serial">Serial #${voter.sr_no}</div>
-      <h1>${voter.name}</h1>
-      <div class="voter-id">${voter.voter_id}</div>
-    </div>
-    
-    <div class="details">
-      <div class="detail-item">
-        <div class="label">Contact Number</div>
-        <div class="value">${voter.mobile}</div>
-      </div>
-      
-      <div class="detail-item">
-        <div class="label">Address</div>
-        <div class="value">${voter.address}</div>
-      </div>
-    </div>
-    
-    <div class="footer">
-      <p>This is an official voter slip record. Generated on ${new Date().toLocaleDateString()}</p>
-    </div>
-  </div>
-</body>
-</html>
-  `;
+
+<title>Voting Slip</title>
+
+<style>
+
+body {
+
+font-family: Arial;
+
+padding: 20px;
+
 }
 
-/**
- * Print voter slip
- */
-export function printVoterSlip(voter: VoterResult): void {
-  const printWindow = window.open('', '_blank');
-  if (printWindow) {
-    printWindow.document.write(generatePrintHTML(voter));
-    printWindow.document.close();
-    printWindow.print();
-  }
+.card {
+
+border: 2px solid #1e3a8a;
+
+padding: 20px;
+
+border-radius: 10px;
+
+}
+
+.header {
+
+display: flex;
+
+align-items: center;
+
+gap: 15px;
+
+}
+
+.header img {
+
+width: 100px;
+
+height: 120px;
+
+border-radius: 8px;
+
+border: 3px solid gold;
+
+}
+
+.name {
+
+font-size: 22px;
+
+font-weight: bold;
+
+}
+
+.ballot {
+
+font-size: 30px;
+
+font-weight: bold;
+
+color: darkblue;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+
+<div class="header">
+
+<img src="${IMAGE_URL}" />
+
+<div>
+
+<div class="name">
+
+VAIBHAV JAIN
+
+</div>
+
+<div>
+
+Ballot No: 136
+
+</div>
+
+</div>
+
+</div>
+
+
+<hr>
+
+
+<h3>Voter Details</h3>
+
+
+<p>
+
+Name: ${voter.name}
+
+</p>
+
+<p>
+
+Voter ID: ${voter.voter_id}
+
+</p>
+
+<p>
+
+Mobile: ${voter.mobile}
+
+</p>
+
+<p>
+
+Address: ${voter.address}
+
+</p>
+
+
+</div>
+
+
+</body>
+
+</html>
+
+`;
+
+}
+
+
+
+/* ================= PRINT ================= */
+
+export function printVoterSlip(voter: VoterResult) {
+
+const win = window.open("", "_blank");
+
+if (!win) return;
+
+win.document.write(generateSlipHTML(voter));
+
+win.document.close();
+
+win.print();
+
+}
+
+
+
+/* ================= DOWNLOAD ================= */
+
+export function downloadVoterSlip(voter: VoterResult) {
+
+const element = document.createElement("a");
+
+const file = new Blob(
+
+[generateSlipHTML(voter)],
+
+{ type: "text/html" }
+
+);
+
+element.href = URL.createObjectURL(file);
+
+element.download = `${voter.name}_VotingSlip.html`;
+
+document.body.appendChild(element);
+
+element.click();
+
+}
+
+
+
+/* ================= WHATSAPP ================= */
+
+export function shareViaWhatsApp(voter: VoterResult) {
+
+
+const message =
+
+`🗳️ Voting Slip
+
+Name: ${voter.name}
+
+Voter ID: ${voter.voter_id}
+
+Ballot No: 136
+
+Candidate: VAIBHAV JAIN
+
+View Slip:
+
+${window.location.origin}/voter-slip/${voter.id}
+
+`;
+
+window.open(
+
+`https://wa.me/?text=${encodeURIComponent(message)}`,
+
+"_blank"
+
+);
+
+}
+
+
+
+/* ================= CONTACT ================= */
+
+export function shareViaContact(voter: VoterResult) {
+
+const vcard =
+
+`BEGIN:VCARD
+
+VERSION:3.0
+
+FN:${voter.name}
+
+TEL:${voter.mobile}
+
+END:VCARD`;
+
+const blob = new Blob(
+
+[vcard],
+
+{ type: "text/vcard" }
+
+);
+
+const url = URL.createObjectURL(blob);
+
+const a = document.createElement("a");
+
+a.href = url;
+
+a.download = `${voter.name}.vcf`;
+
+a.click();
+
+}
+
+
+
+/* ================= COPY ================= */
+
+export function copyToClipboard(text: string) {
+
+navigator.clipboard.writeText(text);
+
 }
