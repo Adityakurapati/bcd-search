@@ -1,137 +1,101 @@
 import { VoterResult } from "./voterService";
 
 
-/* ================= GET IMAGE URL SAFE ================= */
+/* ================= SHARE COMPLETE SLIP ================= */
 
-function getImageURL() {
+export async function shareSlip(voter: VoterResult) {
 
-if (typeof window === "undefined") return "";
+try {
 
-return `${window.location.origin}/vibhav_jain.jpeg`;
+if (typeof window === "undefined") return;
+
+
+// image url
+
+const imageUrl = `${window.location.origin}/vibhav_jain.jpeg`;
+
+
+// message
+
+const message =
+
+`🗳️ BCD Election 2026 Voting Slip
+
+👤 Name: ${voter.name}
+🔢 Serial No: ${voter.sr_no}
+🆔 Voter ID: ${voter.voter_id}
+📱 Mobile: ${voter.mobile}
+
+━━━━━━━━━━━━━━
+
+🙏 Kindly vote for:
+
+⭐ VAIBHAV JAIN
+📌 Ballot No: 136
+
+🗓️ 21–23 Feb 2026
+
+Thank you.`;
+
+
+
+// fetch image
+
+const response = await fetch(imageUrl);
+
+const blob = await response.blob();
+
+
+
+// create file
+
+const file = new File(
+
+[blob],
+
+"VotingSlip.jpg",
+
+{ type: blob.type }
+
+);
+
+
+
+// share
+
+if (navigator.share && navigator.canShare({ files: [file] })) {
+
+await navigator.share({
+
+title: "Voting Slip",
+
+text: message,
+
+files: [file],
+
+});
 
 }
 
+else {
 
+// fallback whatsapp
 
-/* ================= HTML TEMPLATE ================= */
+const whatsappURL =
 
-function generateSlipHTML(voter: VoterResult) {
+`https://wa.me/?text=${encodeURIComponent(message)}`;
 
-const IMAGE_URL = getImageURL();
-
-return `
-
-<html>
-
-<head>
-
-<title>Voting Slip</title>
-
-<style>
-
-body {
-
-font-family: Arial;
-
-padding: 20px;
+window.open(whatsappURL, "_blank");
 
 }
 
-.card {
-
-border: 2px solid #1e3a8a;
-
-padding: 20px;
-
-border-radius: 10px;
-
 }
 
-.header {
+catch (error) {
 
-display: flex;
-
-align-items: center;
-
-gap: 15px;
+console.error("Share failed:", error);
 
 }
-
-.header img {
-
-width: 100px;
-
-height: 120px;
-
-border-radius: 8px;
-
-border: 3px solid gold;
-
-}
-
-.name {
-
-font-size: 22px;
-
-font-weight: bold;
-
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="card">
-
-
-<div class="header">
-
-<img src="${IMAGE_URL}" />
-
-<div>
-
-<div class="name">
-
-VAIBHAV JAIN
-
-</div>
-
-<div>
-
-Ballot No: 136
-
-</div>
-
-</div>
-
-</div>
-
-
-<hr>
-
-
-<h3>Voter Details</h3>
-
-
-<p>Name: ${voter.name}</p>
-
-<p>Voter ID: ${voter.voter_id}</p>
-
-<p>Mobile: ${voter.mobile}</p>
-
-<p>Address: ${voter.address}</p>
-
-
-</div>
-
-
-</body>
-
-</html>
-
-`;
 
 }
 
@@ -141,13 +105,45 @@ Ballot No: 136
 
 export function printVoterSlip(voter: VoterResult) {
 
+if (typeof window === "undefined") return;
+
+
+const imageUrl = `${window.location.origin}/vibhav_jain.jpeg`;
+
+
+const html = `
+
+<html>
+
+<body style="font-family:Arial;padding:20px;">
+
+<img src="${imageUrl}" width="120"/>
+
+<h2>VAIBHAV JAIN</h2>
+
+<h3>Ballot No: 136</h3>
+
+<hr/>
+
+<p>Name: ${voter.name}</p>
+
+<p>Voter ID: ${voter.voter_id}</p>
+
+<p>Mobile: ${voter.mobile}</p>
+
+<p>Address: ${voter.address}</p>
+
+</body>
+
+</html>
+
+`;
+
 const win = window.open("", "_blank");
 
 if (!win) return;
 
-win.document.write(generateSlipHTML(voter));
-
-win.document.close();
+win.document.write(html);
 
 win.print();
 
@@ -159,97 +155,47 @@ win.print();
 
 export function downloadVoterSlip(voter: VoterResult) {
 
-const element = document.createElement("a");
-
-const file = new Blob(
-
-[generateSlipHTML(voter)],
-
-{ type: "text/html" }
-
-);
-
-element.href = URL.createObjectURL(file);
-
-element.download = `${voter.name}_VotingSlip.html`;
-
-document.body.appendChild(element);
-
-element.click();
-
-}
+if (typeof window === "undefined") return;
 
 
+const imageUrl = `${window.location.origin}/vibhav_jain.jpeg`;
 
-/* ================= WHATSAPP ================= */
 
-export function shareViaWhatsApp(voter: VoterResult) {
+const html = `
 
-const origin = typeof window !== "undefined"
+<html>
 
-? window.location.origin
+<body style="font-family:Arial;padding:20px;">
 
-: "";
+<img src="${imageUrl}" width="120"/>
 
-const message =
+<h2>VAIBHAV JAIN</h2>
 
-`🗳️ Voting Slip
+<h3>Ballot No: 136</h3>
 
-Name: ${voter.name}
+<hr/>
 
-Ballot No: 136
+<p>Name: ${voter.name}</p>
 
-Candidate: VAIBHAV JAIN
+<p>Voter ID: ${voter.voter_id}</p>
 
-View Slip:
+<p>Mobile: ${voter.mobile}</p>
 
-${origin}
+<p>Address: ${voter.address}</p>
+
+</body>
+
+</html>
 
 `;
 
-window.open(
-
-`https://wa.me/?text=${encodeURIComponent(message)}`,
-
-"_blank"
-
-);
-
-}
-
-
-
-/* ================= CONTACT ================= */
-
-export function shareViaContact(voter: VoterResult) {
-
-const vcard =
-
-`BEGIN:VCARD
-
-VERSION:3.0
-
-FN:${voter.name}
-
-TEL:${voter.mobile}
-
-END:VCARD`;
-
-const blob = new Blob(
-
-[vcard],
-
-{ type: "text/vcard" }
-
-);
-
-const url = URL.createObjectURL(blob);
+const blob = new Blob([html], { type: "text/html" });
 
 const a = document.createElement("a");
 
-a.href = url;
+a.href = URL.createObjectURL(blob);
 
-a.download = `${voter.name}.vcf`;
+a.download = "VotingSlip.html";
 
 a.click();
 
