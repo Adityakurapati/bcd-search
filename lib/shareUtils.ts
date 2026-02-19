@@ -1,12 +1,23 @@
 import { VoterResult } from "./voterService";
 
 
-const IMAGE_URL = `${window.location.origin}/vibhav_jain.jpeg`;
+/* ================= GET IMAGE URL SAFE ================= */
+
+function getImageURL() {
+
+if (typeof window === "undefined") return "";
+
+return `${window.location.origin}/vibhav_jain.jpeg`;
+
+}
+
 
 
 /* ================= HTML TEMPLATE ================= */
 
 function generateSlipHTML(voter: VoterResult) {
+
+const IMAGE_URL = getImageURL();
 
 return `
 
@@ -66,16 +77,6 @@ font-weight: bold;
 
 }
 
-.ballot {
-
-font-size: 30px;
-
-font-weight: bold;
-
-color: darkblue;
-
-}
-
 </style>
 
 </head>
@@ -114,29 +115,13 @@ Ballot No: 136
 <h3>Voter Details</h3>
 
 
-<p>
+<p>Name: ${voter.name}</p>
 
-Name: ${voter.name}
+<p>Voter ID: ${voter.voter_id}</p>
 
-</p>
+<p>Mobile: ${voter.mobile}</p>
 
-<p>
-
-Voter ID: ${voter.voter_id}
-
-</p>
-
-<p>
-
-Mobile: ${voter.mobile}
-
-</p>
-
-<p>
-
-Address: ${voter.address}
-
-</p>
+<p>Address: ${voter.address}</p>
 
 
 </div>
@@ -200,6 +185,11 @@ element.click();
 
 export function shareViaWhatsApp(voter: VoterResult) {
 
+const origin = typeof window !== "undefined"
+
+? window.location.origin
+
+: "";
 
 const message =
 
@@ -207,15 +197,13 @@ const message =
 
 Name: ${voter.name}
 
-Voter ID: ${voter.voter_id}
-
 Ballot No: 136
 
 Candidate: VAIBHAV JAIN
 
 View Slip:
 
-${window.location.origin}/voter-slip/${voter.id}
+${origin}
 
 `;
 
@@ -264,15 +252,5 @@ a.href = url;
 a.download = `${voter.name}.vcf`;
 
 a.click();
-
-}
-
-
-
-/* ================= COPY ================= */
-
-export function copyToClipboard(text: string) {
-
-navigator.clipboard.writeText(text);
 
 }
