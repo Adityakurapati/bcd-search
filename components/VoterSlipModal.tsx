@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
+import { useState } from 'react';
 import { VoterResult } from '@/lib/voterService';
+
 import {
-  shareViaContact,
+  shareSlip,
   downloadVoterSlip,
   printVoterSlip,
 } from '@/lib/shareUtils';
@@ -14,327 +15,310 @@ import { Button } from '@/components/ui/button';
 import {
   X,
   MessageCircle,
-  Phone,
-  Copy,
   Download,
   Printer,
+  Copy,
 } from 'lucide-react';
 
-interface VoterSlipModalProps {
+
+interface Props {
+
   voter: VoterResult | null;
-  onClose: () => void;
+
   isOpen: boolean;
+
+  onClose: () => void;
+
 }
 
-export default function VoterSlipModal({
-  voter,
-  onClose,
-  isOpen,
-}: VoterSlipModalProps) {
 
-  const [copySuccess, setCopySuccess] = useState(false);
+export default function VoterSlipModal({
+
+  voter,
+
+  isOpen,
+
+  onClose,
+
+}: Props) {
+
+
+  const [copied, setCopied] = useState(false);
+
 
   if (!isOpen || !voter) return null;
 
 
-  /* ================= WHATSAPP MESSAGE ================= */
-
-  const buildWhatsAppMessage = () => {
-
-    return `🗳️ *BCD Election 2026 - Voting Slip*
-
-👤 *Name:* ${voter.name}
-🔢 *Serial No:* ${voter.sr_no}
-🆔 *Voter ID:* ${voter.voter_id}
-📱 *Mobile:* ${voter.mobile}
-📍 *Address:* ${voter.address}
-
-━━━━━━━━━━━━━━━━━━
-
-🙏 Kindly cast your valuable vote in favour of:
-
-⭐ *VAIBHAV JAIN*
-📌 Ballot No: *136*
-
-(Member - Bar Council of Delhi)
-
-🗓️ Election Dates: 21 - 22 - 23 Feb 2026
-
-Thank you.`;
-
-  };
-
-
-  /* ================= ACTIONS ================= */
-
-  const handleWhatsApp = () => {
-
-    const message = encodeURIComponent(buildWhatsAppMessage());
-
-    window.open(`https://wa.me/?text=${message}`, '_blank');
-
-  };
-
-
   const handleCopy = async () => {
 
-    await navigator.clipboard.writeText(buildWhatsAppMessage());
+    const text =
 
-    setCopySuccess(true);
+`BCD Election 2026 Voting Slip
 
-    setTimeout(() => setCopySuccess(false), 2000);
+Name: ${voter.name}
 
-  };
+Serial No: ${voter.sr_no}
 
+Voter ID: ${voter.voter_id}
 
-  const handlePrint = () => {
+Candidate: VAIBHAV JAIN
 
-    printVoterSlip(voter);
+Ballot No: 136`;
 
-  };
+    await navigator.clipboard.writeText(text);
 
+    setCopied(true);
 
-  const handleDownload = () => {
-
-    downloadVoterSlip(voter);
-
-  };
-
-
-  const handleShareContact = () => {
-
-    shareViaContact(voter);
+    setTimeout(() => setCopied(false), 2000);
 
   };
 
-
-  /* ================= UI ================= */
 
   return (
 
-    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
 
+<div className="fixed inset-0 z-50 bg-black/70 flex justify-center items-center p-4">
 
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
 
+<div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden">
 
-        {/* ================= HEADER ================= */}
 
-        <div className="bg-gradient-to-r from-blue-950 to-slate-900 text-white px-6 py-5">
+{/* HEADER */}
 
 
-          <div className="flex justify-between items-start">
+<div className="bg-gradient-to-r from-blue-950 to-slate-900 text-white p-5 flex justify-between">
 
 
-            {/* LEFT SIDE */}
+<div className="flex gap-4">
 
-            <div className="flex gap-4 items-center">
 
+<div className="relative w-20 h-28 border-2 border-yellow-400 rounded-lg overflow-hidden">
 
-              {/* IMAGE */}
 
-              <div className="relative w-20 h-28 rounded-lg overflow-hidden border-2 border-yellow-400 shadow-lg">
+<Image
 
-                <Image
-                  src="/vibhav_jain.jpeg"
-                  alt="Vaibhav Jain"
-                  fill
-                  className="object-cover"
-                />
+src="/vibhav_jain.jpeg"
 
-              </div>
+alt="Vaibhav Jain"
 
+fill
 
-              {/* TEXT */}
+className="object-cover"
 
-              <div>
+/>
 
-                <div className="text-sm text-yellow-400 font-semibold">
-                  BCD Election 2026
-                </div>
 
-                <h2 className="text-xl font-bold">
-                  {voter.name}
-                </h2>
+</div>
 
-                <div className="text-sm text-blue-200">
-                  Serial No: {voter.sr_no}
-                </div>
 
-              </div>
+<div>
 
-            </div>
 
+<div className="text-yellow-400 font-bold">
 
-            {/* CLOSE BUTTON */}
+BCD Election 2026
 
-            <button onClick={onClose}>
-              <X className="w-6 h-6 text-white" />
-            </button>
+</div>
 
 
-          </div>
+<div className="text-xl font-bold">
 
+VAIBHAV JAIN
 
-        </div>
+</div>
 
 
-        {/* ================= CONTENT ================= */}
+<div className="text-sm">
 
-        <div className="p-6 space-y-6">
+Ballot No: 136
 
+</div>
 
-          {/* VOTER DETAILS */}
 
-          <div className="border border-gray-200 rounded-xl p-5 bg-gray-50 shadow-sm">
+</div>
 
 
-            <h3 className="text-lg font-bold mb-4">
-              Voter Details
-            </h3>
+</div>
 
 
-            <div className="space-y-2">
+<button onClick={onClose}>
 
+<X />
 
-              <p>
-                <span className="font-semibold">Voter ID:</span>
-                {" "}
-                {voter.voter_id}
-              </p>
+</button>
 
 
-              <p>
-                <span className="font-semibold">Mobile:</span>
-                {" "}
-                {voter.mobile}
-              </p>
+</div>
 
 
-              <p>
-                <span className="font-semibold">Address:</span>
-                {" "}
-                {voter.address}
-              </p>
 
+{/* BODY */}
 
-            </div>
 
+<div className="p-5 space-y-4">
 
-          </div>
 
+{/* VOTER DETAILS */}
 
-          {/* CANDIDATE CARD */}
 
+<div className="border rounded-lg p-4 bg-gray-50">
 
-          <div className="bg-yellow-400 text-slate-900 rounded-xl p-5 shadow-md">
 
+<h3 className="font-bold mb-3">
 
-            <h3 className="text-xl font-bold">
-              ⭐ Support Our Candidate
-            </h3>
+Voter Details
 
+</h3>
 
-            <div className="text-lg font-bold mt-2">
-              VAIBHAV JAIN
-            </div>
 
+<p>
 
-            <div className="text-sm">
-              Contesting for Member
-            </div>
+<b>Name:</b> {voter.name}
 
+</p>
 
-            <div className="text-3xl font-bold mt-2">
-              Ballot No. 136
-            </div>
 
+<p>
 
-            <p className="mt-2 text-sm">
-              Kindly cast your valuable vote.
-            </p>
+<b>Serial No:</b> {voter.sr_no}
 
+</p>
 
-          </div>
 
+<p>
 
-          {/* BUTTON GRID */}
+<b>Voter ID:</b> {voter.voter_id}
 
+</p>
 
-          <div className="grid grid-cols-2 gap-4">
 
+<p>
 
-            <Button
-              onClick={handleWhatsApp}
-              className="bg-green-500 hover:bg-green-600 text-white"
-            >
+<b>Mobile:</b> {voter.mobile}
 
-              <MessageCircle className="w-4 h-4 mr-2" />
+</p>
 
-              WhatsApp
 
-            </Button>
+<p>
 
+<b>Address:</b> {voter.address}
 
-            <Button
-              onClick={handleShareContact}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
+</p>
 
-              <Phone className="w-4 h-4 mr-2" />
 
-              Contact
+</div>
 
-            </Button>
 
 
-            <Button
-              onClick={handleCopy}
-              variant="outline"
-            >
+{/* SUPPORT CARD */}
 
-              <Copy className="w-4 h-4 mr-2" />
 
-              {copySuccess ? "Copied!" : "Copy"}
+<div className="bg-yellow-400 p-4 rounded-lg text-center">
 
-            </Button>
 
+<div className="font-bold text-lg">
 
-            <Button
-              onClick={handleDownload}
-              variant="outline"
-            >
+Support Candidate
 
-              <Download className="w-4 h-4 mr-2" />
+</div>
 
-              Download
 
-            </Button>
+<div className="font-bold text-xl">
 
+VAIBHAV JAIN
 
-          </div>
+</div>
 
 
-          <Button
-            onClick={handlePrint}
-            className="w-full bg-gray-900 hover:bg-black text-white"
-          >
+<div className="font-bold text-2xl">
 
-            <Printer className="w-4 h-4 mr-2" />
+Ballot No: 136
 
-            Print Slip
+</div>
 
-          </Button>
 
+</div>
 
-        </div>
 
 
-      </div>
+{/* ACTION BUTTONS */}
 
 
-    </div>
+<div className="grid grid-cols-2 gap-3">
 
-  );
+
+<Button
+
+onClick={() => shareSlip(voter)}
+
+className="bg-green-600 text-white"
+
+>
+
+<MessageCircle className="w-4 h-4 mr-2"/>
+
+Share
+
+</Button>
+
+
+
+<Button
+
+onClick={() => downloadVoterSlip(voter)}
+
+>
+
+<Download className="w-4 h-4 mr-2"/>
+
+Download
+
+</Button>
+
+
+
+<Button
+
+onClick={handleCopy}
+
+>
+
+<Copy className="w-4 h-4 mr-2"/>
+
+{copied ? 'Copied' : 'Copy'}
+
+</Button>
+
+
+
+<Button
+
+onClick={() => printVoterSlip(voter)}
+
+className="bg-black text-white"
+
+>
+
+<Printer className="w-4 h-4 mr-2"/>
+
+Print
+
+</Button>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+);
+
 
 }
